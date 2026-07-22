@@ -94,7 +94,14 @@ def normalize_for_tts(text: str) -> str:
     text = _re.sub(r"[─━―]{2,}", " ", text)          # decorative rules
     text = _re.sub(r"\s*[•·]\s*(?=[A-Za-z\u4e00-\u9fff])", "，", text)
     text = _re.sub(r"\s*[→←]\s*", "，", text)       # arrows → pause
-    text = _re.sub(r"[💡🤔📌🔑⭐✨🌟]", "", text)      # decorative emoji labels
+    # Strip decorative icons. Azure narrates them by name (🌀 → "龙卷风"),
+    # which derails a heading like "🌀 越界 · 跨学科的联想". Runs AFTER the
+    # ✓/✗/⚠ replacements above, which need those glyphs intact.
+    text = _re.sub(
+        r"[\U0001F300-\U0001FAFF\u2600-\u27BF\u2B00-\u2BFF\uFE0F\u200D]",
+        "", text,
+    )
+    text = _re.sub(r"[ \t]{2,}", " ", text)
     return text
 
 
